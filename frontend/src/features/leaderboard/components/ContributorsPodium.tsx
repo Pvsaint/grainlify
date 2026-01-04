@@ -18,8 +18,12 @@ export function ContributorsPodium({ topThree, isLoaded }: ContributorsPodiumPro
       }`}>
         <div className="backdrop-blur-[30px] bg-gradient-to-br from-white/[0.25] to-white/[0.15] border-2 border-white/40 rounded-[18px] p-6 w-[150px] shadow-[0_6px_24px_rgba(0,0,0,0.1)] mb-3 hover:shadow-[0_8px_28px_rgba(0,0,0,0.15)] hover:scale-105 transition-all duration-300 group">
           <div className="relative">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#c9983a]/80 to-[#a67c2e]/70 flex items-center justify-center mx-auto mb-3 border-2 border-white/30 shadow-lg text-2xl group-hover:rotate-12 transition-transform duration-300">
-              {topThree[1].avatar}
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#c9983a]/80 to-[#a67c2e]/70 flex items-center justify-center mx-auto mb-3 border-2 border-white/30 shadow-lg text-2xl group-hover:rotate-12 transition-transform duration-300 overflow-hidden">
+              {topThree[1].avatar.startsWith('http') ? (
+                <img src={topThree[1].avatar} alt={topThree[1].username} className="w-full h-full object-cover" />
+              ) : (
+                topThree[1].avatar
+              )}
             </div>
             <Sparkles className="absolute -top-1 -right-1 w-4 h-4 text-[#c9983a] opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
@@ -83,8 +87,12 @@ export function ContributorsPodium({ topThree, isLoaded }: ContributorsPodiumPro
           <div className="absolute -inset-3 border-2 border-[#c9983a]/20 rounded-[24px] animate-ping-gentle" />
           
           <div className="relative">
-            <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-[#c9983a] to-[#a67c2e] flex items-center justify-center mx-auto mb-3 border-2 border-[#d4af37] shadow-xl text-3xl group-hover:rotate-[360deg] transition-transform duration-700">
-              {topThree[0].avatar}
+            <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-[#c9983a] to-[#a67c2e] flex items-center justify-center mx-auto mb-3 border-2 border-[#d4af37] shadow-xl text-3xl group-hover:rotate-[360deg] transition-transform duration-700 overflow-hidden">
+              {topThree[0].avatar.startsWith('http') ? (
+                <img src={topThree[0].avatar} alt={topThree[0].username} className="w-full h-full object-cover" />
+              ) : (
+                topThree[0].avatar
+              )}
               {/* Crown on top */}
               <Crown className="absolute -top-6 left-1/2 -translate-x-1/2 w-6 h-6 text-[#d4af37] animate-float" />
             </div>
@@ -113,8 +121,12 @@ export function ContributorsPodium({ topThree, isLoaded }: ContributorsPodiumPro
       }`}>
         <div className="backdrop-blur-[30px] bg-gradient-to-br from-white/[0.25] to-white/[0.15] border-2 border-white/40 rounded-[18px] p-6 w-[150px] shadow-[0_6px_24px_rgba(0,0,0,0.1)] mb-3 hover:shadow-[0_8px_28px_rgba(0,0,0,0.15)] hover:scale-105 transition-all duration-300 group">
           <div className="relative">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#b89968]/80 to-[#9a7d4f]/70 flex items-center justify-center mx-auto mb-3 border-2 border-white/30 shadow-lg text-2xl group-hover:rotate-12 transition-transform duration-300">
-              {topThree[2].avatar}
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#b89968]/80 to-[#9a7d4f]/70 flex items-center justify-center mx-auto mb-3 border-2 border-white/30 shadow-lg text-2xl group-hover:rotate-12 transition-transform duration-300 overflow-hidden">
+              {topThree[2].avatar.startsWith('http') ? (
+                <img src={topThree[2].avatar} alt={topThree[2].username} className="w-full h-full object-cover" />
+              ) : (
+                topThree[2].avatar
+              )}
             </div>
             <Sparkles className="absolute -top-1 -right-1 w-4 h-4 text-[#b89968] opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>

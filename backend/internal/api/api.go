@@ -152,17 +152,24 @@ func New(cfg config.Config, deps Deps) *fiber.App {
 	ecosystems := handlers.NewEcosystemsPublicHandler(deps.DB)
 	app.Get("/ecosystems", ecosystems.ListActive())
 
+	// Public leaderboard
+	leaderboard := handlers.NewLeaderboardHandler(deps.DB)
+	app.Get("/leaderboard", leaderboard.Leaderboard())
+
 	// Public projects list with filtering
 	projectsPublic := handlers.NewProjectsPublicHandler(deps.DB)
 	app.Get("/projects", projectsPublic.List())
 	app.Get("/projects/filters", projectsPublic.FilterOptions())
-	app.Get("/projects/:id", projectsPublic.Get())
-	app.Get("/projects/:id/issues/public", projectsPublic.IssuesPublic())
-	app.Get("/projects/:id/prs/public", projectsPublic.PRsPublic())
 
 	projects := handlers.NewProjectsHandler(cfg, deps.DB)
 	app.Post("/projects", auth.RequireAuth(cfg.JWTSecret), projects.Create())
+	// IMPORTANT: /projects/mine must come BEFORE /projects/:id to avoid route conflict
 	app.Get("/projects/mine", auth.RequireAuth(cfg.JWTSecret), projects.Mine())
+
+	// These routes with :id must come AFTER specific routes like /projects/mine
+	app.Get("/projects/:id", projectsPublic.Get())
+	app.Get("/projects/:id/issues/public", projectsPublic.IssuesPublic())
+	app.Get("/projects/:id/prs/public", projectsPublic.PRsPublic())
 	app.Post("/projects/:id/verify", auth.RequireAuth(cfg.JWTSecret), projects.Verify())
 
 	sync := handlers.NewSyncHandler(deps.DB)

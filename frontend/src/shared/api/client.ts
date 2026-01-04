@@ -277,6 +277,20 @@ export const getEcosystems = () =>
     }>;
   }>('/ecosystems');
 
+// Leaderboard
+export const getLeaderboard = (limit = 10) =>
+  apiRequest<Array<{
+    rank: number;
+    username: string;
+    avatar: string;
+    user_id: string;
+    contributions: number;
+    ecosystems: string[];
+    score: number;
+    trend: 'up' | 'down' | 'same';
+    trendValue: number;
+  }>>(`/leaderboard?limit=${limit}`);
+
 // KYC
 export const startKYCVerification = () =>
   apiRequest<{

@@ -111,16 +111,26 @@ RETURNING id, status
 
 func (h *ProjectsHandler) Mine() fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		slog.Info("projects/mine: handler called",
+			"method", c.Method(),
+			"path", c.Path(),
+			"request_id", c.Locals("requestid"),
+		)
+
 		if h.db == nil || h.db.Pool == nil {
+			slog.Error("projects/mine: database not configured",
+				"request_id", c.Locals("requestid"),
+			)
 			return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{"error": "db_not_configured"})
 		}
 
 		sub, ok := c.Locals(auth.LocalUserID).(string)
 		if !ok || sub == "" {
+			requestID := c.Locals("requestid")
 			slog.Warn("projects/mine: missing or invalid user_id in context",
 				"user_id_type", fmt.Sprintf("%T", c.Locals(auth.LocalUserID)),
 				"user_id_value", c.Locals(auth.LocalUserID),
-				"request_id", c.Locals("requestid"),
+				"request_id", requestID,
 			)
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "invalid_user"})
 		}
@@ -134,6 +144,11 @@ func (h *ProjectsHandler) Mine() fiber.Handler {
 			)
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "invalid_user"})
 		}
+
+		slog.Info("projects/mine: querying projects",
+			"user_id", userID.String(),
+			"request_id", c.Locals("requestid"),
+		)
 
 		rows, err := h.db.Pool.Query(c.Context(), `
 SELECT 
@@ -159,6 +174,11 @@ WHERE p.owner_user_id = $1
 ORDER BY p.created_at DESC
 `, userID)
 		if err != nil {
+			slog.Error("projects/mine: database query failed",
+				"user_id", userID.String(),
+				"error", err,
+				"request_id", c.Locals("requestid"),
+			)
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "projects_list_failed"})
 		}
 		defer rows.Close()
@@ -212,6 +232,12 @@ ORDER BY p.created_at DESC
 		if out == nil {
 			out = []fiber.Map{}
 		}
+
+		slog.Info("projects/mine: returning projects",
+			"user_id", userID.String(),
+			"count", len(out),
+			"request_id", c.Locals("requestid"),
+		)
 
 		return c.Status(fiber.StatusOK).JSON(out)
 	}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { LeaderboardType, FilterType, Petal } from '../types';
-import { leaderboardData, projectsData } from '../data/leaderboardData';
+import { LeaderboardType, FilterType, Petal, LeaderData } from '../types';
+import { projectsData } from '../data/leaderboardData';
+import { getLeaderboard } from '../../../shared/api/client';
 import { FallingPetals } from '../components/FallingPetals';
 import { LeaderboardTypeToggle } from '../components/LeaderboardTypeToggle';
 import { LeaderboardHero } from '../components/LeaderboardHero';
@@ -18,6 +19,43 @@ export function LeaderboardPage() {
   const [selectedEcosystem, setSelectedEcosystem] = useState('All Ecosystems');
   const [petals, setPetals] = useState<Petal[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [leaderboardData, setLeaderboardData] = useState<LeaderData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch leaderboard data
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      if (leaderboardType === 'contributors') {
+        setIsLoading(true);
+        setError(null);
+        try {
+          const data = await getLeaderboard(10);
+          // Transform API data to match LeaderData type
+          const transformedData: LeaderData[] = data.map((item) => ({
+            rank: item.rank,
+            username: item.username,
+            avatar: item.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.username)}&background=c9983a&color=fff&size=128`,
+            score: item.score,
+            trend: item.trend,
+            trendValue: item.trendValue,
+            contributions: item.contributions,
+            ecosystems: item.ecosystems || [],
+          }));
+          setLeaderboardData(transformedData);
+        } catch (err) {
+          console.error('Failed to fetch leaderboard:', err);
+          setError(err instanceof Error ? err.message : 'Failed to load leaderboard');
+          // Fallback to empty array
+          setLeaderboardData([]);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchLeaderboard();
+  }, [leaderboardType]);
 
   // Generate falling petals on mount
   useEffect(() => {
@@ -44,7 +82,21 @@ export function LeaderboardPage() {
     return () => clearInterval(interval);
   }, []);
 
-  const contributorTopThree = leaderboardData.slice(0, 3);
+  // Ensure we have at least 3 items for the podium (pad with empty data if needed)
+  const contributorTopThree: LeaderData[] = [
+    ...leaderboardData.slice(0, 3),
+    ...Array(Math.max(0, 3 - leaderboardData.length)).fill(null).map((_, i) => ({
+      rank: leaderboardData.length + i + 1,
+      username: '-',
+      avatar: '👤',
+      score: 0,
+      trend: 'same' as const,
+      trendValue: 0,
+      contributions: 0,
+      ecosystems: [],
+    })),
+  ].slice(0, 3) as LeaderData[];
+  
   const projectTopThree = projectsData.slice(0, 3);
 
   return (
@@ -62,8 +114,13 @@ export function LeaderboardPage() {
       {/* Hero Header Section */}
       <LeaderboardHero leaderboardType={leaderboardType} isLoaded={isLoaded}>
         {/* Top 3 Podium - Contributors */}
-        {leaderboardType === 'contributors' && (
+        {leaderboardType === 'contributors' && leaderboardData.length > 0 && (
           <ContributorsPodium topThree={contributorTopThree} isLoaded={isLoaded} />
+        )}
+        {leaderboardType === 'contributors' && leaderboardData.length === 0 && !isLoading && (
+          <div className="text-center py-8 text-gray-500">
+            No contributors yet. Be the first to contribute!
+          </div>
         )}
 
         {/* Top 3 Podium - Projects */}
@@ -85,11 +142,25 @@ export function LeaderboardPage() {
 
       {/* Leaderboard Table - Contributors */}
       {leaderboardType === 'contributors' && (
-        <ContributorsTable
-          data={leaderboardData}
-          activeFilter={activeFilter}
-          isLoaded={isLoaded}
-        />
+        <>
+          {isLoading && (
+            <div className="text-center py-12 text-gray-500">
+              Loading leaderboard...
+            </div>
+          )}
+          {error && (
+            <div className="text-center py-12 text-red-500">
+              {error}
+            </div>
+          )}
+          {!isLoading && !error && (
+            <ContributorsTable
+              data={leaderboardData}
+              activeFilter={activeFilter}
+              isLoaded={isLoaded}
+            />
+          )}
+        </>
       )}
 
       {/* Leaderboard Table - Projects */}

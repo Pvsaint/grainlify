@@ -331,6 +331,37 @@ If you have a separate worker service (`cmd/worker`):
 2. Consider upgrading plan or optimizing code
 3. Check for memory leaks in handlers
 
+### Container Stops Unexpectedly
+
+If your container stops after running successfully (receives SIGTERM and shuts down gracefully):
+
+1. **Railway Free Tier Auto-Sleep**: Railway's free tier automatically puts containers to sleep after periods of inactivity to save resources. This is expected behavior.
+   - Containers will wake up automatically when they receive a request
+   - First request after sleep may take longer (cold start)
+   - Solution: Upgrade to Developer plan ($20/month) to prevent auto-sleep
+
+2. **Health Check Configuration**: Configure health checks in Railway dashboard:
+   - Go to your service → **Settings** → **Health Checks**
+   - Set **Health Check Path** to: `/health`
+   - Set **Health Check Interval** to: `30` seconds
+   - Set **Health Check Timeout** to: `10` seconds
+   - This helps Railway know your service is healthy
+
+3. **Deployment Restart**: Railway may restart containers during deployments or updates
+   - Check **Deployments** tab in Railway dashboard
+   - Look for recent deployments that might have triggered a restart
+
+4. **Resource Limits**: Check if you're hitting memory or CPU limits
+   - View **Metrics** tab in Railway dashboard
+   - Free tier has 512MB RAM limit per service
+   - Consider upgrading if consistently hitting limits
+
+5. **Manual Stop**: Check if container was manually stopped
+   - Review Railway dashboard activity logs
+   - Verify no manual stop/restart was triggered
+
+**Note**: The application handles SIGTERM gracefully, so shutdown logs showing "shutdown signal received" and "shutdown complete" are normal when Railway stops the container.
+
 ---
 
 ## Railway CLI Commands

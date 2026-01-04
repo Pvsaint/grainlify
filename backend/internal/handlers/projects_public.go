@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"strings"
 	"time"
 
@@ -26,12 +27,25 @@ func NewProjectsPublicHandler(d *db.DB) *ProjectsPublicHandler {
 // Get returns a single verified project by id, enriched with GitHub repo metadata and language breakdown.
 func (h *ProjectsPublicHandler) Get() fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		projectIDParam := c.Params("id")
+		slog.Info("projects/:id: handler called",
+			"method", c.Method(),
+			"path", c.Path(),
+			"id_param", projectIDParam,
+			"request_id", c.Locals("requestid"),
+		)
+
 		if h.db == nil || h.db.Pool == nil {
 			return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{"error": "db_not_configured"})
 		}
 
-		projectID, err := uuid.Parse(c.Params("id"))
+		projectID, err := uuid.Parse(projectIDParam)
 		if err != nil {
+			slog.Warn("projects/:id: invalid project ID format",
+				"id_param", projectIDParam,
+				"error", err,
+				"request_id", c.Locals("requestid"),
+			)
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid_project_id"})
 		}
 

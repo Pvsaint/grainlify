@@ -70,8 +70,12 @@ export function ContributorsTable({ data, activeFilter, isLoaded }: Contributors
 
             {/* Contributor */}
             <div className="col-span-6 flex items-center gap-3">
-              <div className={`relative w-12 h-12 rounded-full bg-gradient-to-br ${getAvatarGradient(index)} flex items-center justify-center text-white font-bold text-[18px] shadow-md border-2 border-white/25 group-hover:scale-125 group-hover:shadow-lg group-hover:rotate-12 transition-all duration-300`}>
-                {leader.avatar}
+              <div className={`relative w-12 h-12 rounded-full bg-gradient-to-br ${getAvatarGradient(index)} flex items-center justify-center text-white font-bold text-[18px] shadow-md border-2 border-white/25 group-hover:scale-125 group-hover:shadow-lg group-hover:rotate-12 transition-all duration-300 overflow-hidden`}>
+                {leader.avatar.startsWith('http') ? (
+                  <img src={leader.avatar} alt={leader.username} className="w-full h-full object-cover" />
+                ) : (
+                  leader.avatar
+                )}
                 {/* Glow ring on hover */}
                 <div className="absolute inset-0 rounded-full border-2 border-[#c9983a]/0 group-hover:border-[#c9983a]/50 transition-all duration-300 animate-ping-on-hover" />
               </div>
