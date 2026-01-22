@@ -33,11 +33,12 @@ import { SettingsPage } from '../settings/pages/SettingsPage';
 import { AdminPage } from '../admin/pages/AdminPage';
 import { SearchPage } from './pages/SearchPage';
 
+
 export function Dashboard() {
   const { userRole, logout, login } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
-  const [currentPage, setCurrentPage] = useState('discover');
+  // const [currentPage, setCurrentPage] = useState('discover');
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [selectedIssue, setSelectedIssue] = useState<{ issueId: string; projectId?: string } | null>(null);
   const [selectedEcosystemId, setSelectedEcosystemId] = useState<string | null>(null);
@@ -51,6 +52,22 @@ export function Dashboard() {
   const [viewingUserLogin, setViewingUserLogin] = useState<string | null>(null);
   const [settingsInitialTab, setSettingsInitialTab] = useState<SettingsTabType>('profile');
 
+
+  // ******************************************
+
+// Persist current tab across reload
+  const [currentPage, setCurrentPage] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tabFromUrl = params.get("tab");
+    if (tabFromUrl) return tabFromUrl;
+
+    return localStorage.getItem("dashboardTab") || "discover";
+  });
+
+
+
+
+
   // Admin password gating (bootstrap token)
   const [showAdminPasswordModal, setShowAdminPasswordModal] = useState(false);
   const [adminPassword, setAdminPassword] = useState('');
@@ -60,25 +77,52 @@ export function Dashboard() {
   });
   const [pendingAdminTarget, setPendingAdminTarget] = useState<'nav' | 'role' | null>(null);
 
+ 
+
+
+
+
+
+
+
   // Check URL params for viewing other users' profiles
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const userParam = params.get('user');
-    const pageParam = params.get('page');
+  // useEffect(() => {
+  //   const params = new URLSearchParams(window.location.search);
+  //   const userParam = params.get('user');
+  //   const pageParam = params.get('page');
     
-    if (pageParam === 'profile' && userParam) {
-      setCurrentPage('profile');
-      // Check if it's a UUID (user_id) or a username (login)
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (uuidRegex.test(userParam)) {
-        setViewingUserId(userParam);
-        setViewingUserLogin(null);
-      } else {
-        setViewingUserLogin(userParam);
-        setViewingUserId(null);
-      }
-    }
-  }, []);
+  //   if (pageParam === 'profile' && userParam) {
+  //     setCurrentPage('profile');
+  //     // Check if it's a UUID (user_id) or a username (login)
+  //     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  //     if (uuidRegex.test(userParam)) {
+  //       setViewingUserId(userParam);
+  //       setViewingUserLogin(null);
+  //     } else {
+  //       setViewingUserLogin(userParam);
+  //       setViewingUserId(null);
+  //     }
+  //   }
+  // }, []);
+
+// *******************************
+ useEffect(() => {
+    // Save tab in URL + localStorage whenever it changes
+    const params = new URLSearchParams(window.location.search);
+    params.set("tab", currentPage);
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState({}, "", newUrl);
+
+    localStorage.setItem("dashboardTab", currentPage);
+  }, [currentPage]);
+
+  // Example tab list
+  const tabs = ["discover", "browse", "open-source-week", "ecosystems", "contributors", "settings"];
+
+  
+
+
+
 
   // Keyboard shortcut for search (Cmd+K / Ctrl+K)
   useEffect(() => {
