@@ -299,11 +299,12 @@ export function ModalSelect({
         />
       </button>
 
+{/* Custom Dropdown Menu - FINAL THEME FIX */}
       {isOpen && (
         <div
           className={`absolute z-[100] w-full mt-[80px] max-h-60 overflow-auto rounded-[14px] border shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200 ${
             theme === 'dark' 
-              ? 'bg-[#1a1a1a] border-white/10' 
+              ? 'bg-[#2d241d] border-[#c9983a]/20 shadow-black/40' // Dark Brown background + Gold border
               : 'bg-[#ede3d0] border-[#c9983a]/60 shadow-amber-900/20'
           }`}
         >
@@ -318,8 +319,8 @@ export function ModalSelect({
                 className={`px-4 py-2.5 cursor-pointer text-[14px] transition-colors flex items-center justify-between ${
                   theme === 'dark'
                     ? value === option.value
-                      ? 'bg-[#c9983a]/30 text-[#c9983a] font-bold'
-                      : 'text-gray-300 hover:bg-white/5'
+                      ? 'bg-[#c9983a]/20 text-[#c9983a] font-bold' // Dark mode active
+                      : 'text-[#e8dfd0] hover:bg-[#c9983a]/10'     // Dark mode hover (Cream text, gold bg)
                     : value === option.value
                       ? 'bg-[#c9983a]/30 text-[#8b6b2d] font-bold'
                       : 'text-[#5c4d3c] hover:bg-[#c9983a]/20'
