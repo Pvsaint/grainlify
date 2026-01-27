@@ -1137,7 +1137,7 @@ impl BountyEscrowContract {
 
         let admin: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
         admin.require_auth();
-        
+
         if !env.storage().persistent().has(&DataKey::Escrow(bounty_id)) {
             return Err(Error::BountyNotFound);
         }
@@ -1219,8 +1219,8 @@ impl BountyEscrowContract {
                 refund_amount = escrow.remaining_amount;
                 refund_recipient = escrow.depositor.clone();
                 if is_before_deadline {
-            return Err(Error::DeadlineNotPassed);
-        }
+                    return Err(Error::DeadlineNotPassed);
+                }
             }
             RefundMode::Partial => {
                 refund_amount = amount.unwrap_or(escrow.remaining_amount);
@@ -1300,7 +1300,7 @@ impl BountyEscrowContract {
 
         // Update status
         if escrow.remaining_amount == 0 {
-        escrow.status = EscrowStatus::Refunded;
+            escrow.status = EscrowStatus::Refunded;
         } else {
             escrow.status = EscrowStatus::PartiallyRefunded;
         }
@@ -1359,7 +1359,7 @@ impl BountyEscrowContract {
     /// println!("Deadline: {}", escrow_info.deadline);
     /// ```
     pub fn get_escrow_info(env: Env, bounty_id: u64) -> Result<Escrow, Error> {
-         if !env.storage().persistent().has(&DataKey::Escrow(bounty_id)) {
+        if !env.storage().persistent().has(&DataKey::Escrow(bounty_id)) {
             return Err(Error::BountyNotFound);
         }
         Ok(env
@@ -1392,7 +1392,7 @@ impl BountyEscrowContract {
     /// println!("Total locked: {} stroops", balance);
     /// ```
     pub fn get_balance(env: Env) -> Result<i128, Error> {
-         if !env.storage().instance().has(&DataKey::Token) {
+        if !env.storage().instance().has(&DataKey::Token) {
             return Err(Error::NotInitialized);
         }
         let token_addr: Address = env.storage().instance().get(&DataKey::Token).unwrap();

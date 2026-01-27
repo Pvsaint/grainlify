@@ -100,7 +100,7 @@ fn test_lock_funds_duplicate() {
     setup
         .escrow
         .lock_funds(&setup.depositor, &bounty_id, &amount, &deadline);
-    
+
     // Try to lock again with same bounty_id
     setup
         .escrow
